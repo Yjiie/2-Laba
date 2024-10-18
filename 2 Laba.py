@@ -4,30 +4,38 @@
 2.Распознавание и обработку делать  через регулярные выражения;
 3.В вариантах, где есть параметр (например К), допускается его заменить на любое число;
 4.Все остальные требования соответствуют варианту задания лабораторной работы №1.
-Натуральные числа, не превышающие 1 000 000, у которых вторая слева цифра равна 3.
-Выводит на экран нечетные цифры стоящие в числе справа от этой 3. Цифры, стоящие на нечетных местах (в числе), выводятся прописью.
+Вариант 14.
+Четные двоичные числа, не превышающие 204810, у которых вторая справа цифра равна 0. Выводит на экран цифры числа, исключая нули. Вычисляется среднее число между минимальным и максимальным и выводится прописью.
 '''
 import re
 
 def digit_to_text(digit):
-    digit_dict = {'0': 'ноль', '1': 'один', '2': 'два', '3': 'три', '4': 'четыре', '5': 'пять', '6': 'шесть',
-                  '7': 'семь', '8': 'восемь', '9': 'девять'}
-    return digit_dict.get(digit, '')
+    words = {
+        '0': 'ноль', '1': 'один', '2': 'два', '3': 'три', '4': 'четыре',
+        '5': 'пять', '6': 'шесть', '7': 'семь', '8': 'восемь', '9': 'девять'
+    }
+    return words.get(digit, '')
 
 def main():
-    with open("laba.txt", "r") as file:
-        data = file.read()
-        regul = "\d3\d{5}"                    #регулярное выражение
-        numbers = re.findall(regul, data)
+    valid_numbers = []
 
-        for number in numbers:
-            print("Число с второй слева цифрой равной 3:", number)
-            print("Нечетные цифры справа от тройки:")
-            for digit in number[2:]:
-                if int(digit) % 2 != 0:            #Проверка является ли текущая цифра нечетной
-                    print(digit)
-            print("Цифры, стоящие на нечетных местах (в числе):")
-            for i, digit in enumerate(number):
-                if i % 2 != 0:                     #Проверяется, находится ли цифра на нечетной позиции (индексе) и является ли ее позиция больше второй
-                    print(digit_to_text(digit))
+    with open('input.txt', 'r') as file:
+        content = file.read()
+
+    pattern = r'\b[01]+0[01]+\b'
+    matches = re.findall(pattern, content)
+
+    for match in matches:
+        if int(match, 2) % 2 == 0 and int(match, 2) <= 2048:
+            valid_numbers.append(int(match, 2))
+            print(''.join([digit for digit in match if digit != '0']))
+
+    if len(valid_numbers) > 1:
+        min_num = min(valid_numbers)
+        max_num = max(valid_numbers)
+        avg_num = (min_num + max_num) // 2
+        print(f"Среднее число между {min_num} и {max_num} - {avg_num} прописью: {' '.join([digit_to_text(digit) for digit in str(avg_num)])}")
+    else:
+        print("Недостаточно чисел для вычисления среднего.")
+
 main()
