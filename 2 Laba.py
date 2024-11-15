@@ -10,32 +10,34 @@
 import re
 
 def digit_to_text(digit):
-    words = {
+    digit_dict = {
         '0': 'ноль', '1': 'один', '2': 'два', '3': 'три', '4': 'четыре',
         '5': 'пять', '6': 'шесть', '7': 'семь', '8': 'восемь', '9': 'девять'
     }
-    return words.get(digit, '')
+    return digit_dict.get(digit, '')
 
-def main():
-    valid_numbers = []
+valid_numbers = []
 
-    with open('input.txt', 'r') as file:
-        content = file.read()
+with open("text.txt", "r") as file:
+    content = file.read()
+    pattern = r'\b[01]+\b'
+    binary_numbers = re.findall(pattern, content)
 
-    pattern = r'\b[01]+0[01]+\b'
-    matches = re.findall(pattern, content)
+    for number in binary_numbers:
+        if all(c in "01" for c in number):
+            decimal_value = int(number, 2)
+            if (
+                    decimal_value <= 2048 and
+                    decimal_value % 2 == 0 and
+                    len(number) > 1 and number[-2] == '0'
+            ):
+                valid_numbers.append(decimal_value)
+                print("Цифры числа, исключая нули:", " ".join(c for c in number if c != '0'))
 
-    for match in matches:
-        if int(match, 2) % 2 == 0 and int(match, 2) <= 2048:
-            valid_numbers.append(int(match, 2))
-            print(''.join([digit for digit in match if digit != '0']))
-
-    if len(valid_numbers) > 1:
-        min_num = min(valid_numbers)
-        max_num = max(valid_numbers)
-        avg_num = (min_num + max_num) // 2
-        print(f"Среднее число между {min_num} и {max_num} - {avg_num} прописью: {' '.join([digit_to_text(digit) for digit in str(avg_num)])}")
-    else:
-        print("Недостаточно чисел для вычисления среднего.")
-
-main()
+if valid_numbers:
+    min_value = min(valid_numbers)
+    max_value = max(valid_numbers)
+    avg_value = (min_value + max_value) // 2
+    print("Среднее число прописью:", " ".join(digit_to_text(d) for d in str(avg_value)))
+else:
+    print("Не найдено подходящих чисел.")
