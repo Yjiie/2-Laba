@@ -9,35 +9,50 @@
 '''
 import re
 
+# Словарь для перевода цифр в текст
 digit_dict = {
     '0': 'ноль', '1': 'один', '2': 'два', '3': 'три', '4': 'четыре',
     '5': 'пять', '6': 'шесть', '7': 'семь', '8': 'восемь', '9': 'девять'
 }
 
-valid_numbers = []
+valid_numbers = []  # Список для хранения подходящих чисел
 
+# Открываем файл "text.txt" для чтения
 with open("text.txt", "r") as file:
     content = file.read()
-    pattern = r'\b-?[01]+\b'
+
+    # Регулярное выражение для поиска двоичных чисел
+    pattern = r'\b[+-]?[01]*0[01]\b'
     binary_numbers = re.findall(pattern, content)
 
     for number in binary_numbers:
+        # Преобразуем двоичное число в десятичное
         if number[0] == '-':
             decimal_value = -int(number[1:], 2)
+        elif number[0] == '+':
+            decimal_value = int(number[1:], 2)
         else:
             decimal_value = int(number, 2)
 
-        if abs(decimal_value) <= 2048 and decimal_value % 2 == 0 and len(number) > 1 and number[-2] == '0':
+        # Проверяем, что число меньше 2048
+        if abs(decimal_value) <= 2048:
             valid_numbers.append(decimal_value)
-            filtered_digits = [c for c in number if c not in {'0', '-'}]
-            if filtered_digits:
+
+            # Исключаем нули и знак из числа
+            filtered_digits = [c for c in number if c not in {'0', '-', '+'}]
+
+            if filtered_digits:  # Если после фильтрации остались цифры
                 print("Цифры числа, исключая нули:", " ".join(filtered_digits))
 
+# Анализ чисел
 if valid_numbers:
-    min_value = min(valid_numbers)
-    max_value = max(valid_numbers)
-    avg_value = (min_value + max_value) // 2
+    min_value = min(valid_numbers)  # Минимальное число
+    max_value = max(valid_numbers)  # Максимальное число
+    avg_value = (min_value + max_value) // 2  # Среднее значение между минимальным и максимальным
+
+  
     avg_text = [digit_dict[digit] for digit in str(abs(avg_value))]
+
     print("Среднее число прописью:", " ".join(avg_text))
 else:
     print("Не найдено подходящих чисел.")
